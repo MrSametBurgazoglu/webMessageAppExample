@@ -19,7 +19,7 @@ func ConnectDatabase() {
 		panic("Failed to connect to database!")
 	}
 
-	migrateErr := db.AutoMigrate(&groupModels.Group{}, &messageModels.GroupMessage{}, &messageModels.PersonMessage{}, &peopleModels.Person{})
+	migrateErr := db.AutoMigrate(&groupModels.Group{}, &messageModels.Message{}, &messageModels.Chat{}, &peopleModels.Person{})
 	if migrateErr != nil {
 		return
 	}

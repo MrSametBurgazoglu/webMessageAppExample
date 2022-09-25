@@ -1,13 +1,18 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+)
 
-type PersonMessage struct {
+type Message struct {
 	gorm.Model
-	Context string `json:"nickname"`
+	Context  string `json:"nickname"`
+	PersonID uint
+	ChatID   uint
 }
 
-type GroupMessage struct {
+type Chat struct {
 	gorm.Model
-	Context string `json:"nickname"`
+	Messages []Message
+	GroupID  uint
 }
