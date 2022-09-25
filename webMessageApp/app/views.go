@@ -6,9 +6,13 @@ import (
 )
 
 func HomePage(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"data": "hey"})
+	c.HTML(http.StatusOK, "index.html", gin.H{
+		"title": "Main website",
+	})
 }
 
 func ChatPage(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"data": "hey"})
+	c.HTML(http.StatusOK, "chat.html", gin.H{
+		"nickname": "Samet Burgazoğlu",
+	})
 }
