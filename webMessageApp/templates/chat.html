@@ -1,11 +1,103 @@
 <html class="w-100 h-100">
-<head>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
-</head>
+
+{{ template "header.html"}}
+
+<script>
+    const currentPersonID = {{.id}}
+    var currentChatID = null
+
+    function sendClicked(){
+        var TextArea = $("#contextArea")
+        $.ajax({
+            url: "/message/messages",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({Person: parseInt(currentPersonID), Chat: currentChatID, Context: TextArea.val()}),
+            cache: true,
+            success: function(response){
+                console.log(response)
+            }});
+        chatClicked(currentChatID);
+        TextArea.val('')
+    }
+
+    function chatClicked(p1){
+        console.log(p1)
+        currentChatID = p1
+        var messageDiv = $("#messageDiv")
+        $.ajax({
+            url: "/message/chat_messages/"+p1+"/",
+            type: "GET",
+            cache: true,
+            success: function(response){
+                console.log(response.data)
+                messageDiv.html("")
+                for (item in response.data){
+                    console.log(response.data[item]);
+                    console.log(response.data[item].context);
+                    console.log(response.data[item].Person.nickname);
+                    const time = new Date(response.data[item].CreatedAt);
+
+                    const newMessage = `<div class="card w-50" style="background-color: #212529; color: whitesmoke;`
+                    const newMessage2 = `"><div class="card-body"><div class="card-title row d-flex"><div class="col">` +
+                        `<h5 class="card-title">` + response.data[item].Person.nickname + `</h5>` +
+                        `</div>` +
+                        `<div class="col-2">` +
+                        time.getHours() + `:` + time.getMinutes() +
+                        `</div></div>` +
+                        `<p class="card-text">` + response.data[item].context + `</p>` +
+                        `</div>`;
+                    const heyMessage = "</div>";
+                    if (currentPersonID === response.data[item].Person.ID.toString()){
+                        messageDiv.append(newMessage+"margin-left:auto"+newMessage2+heyMessage)
+                    }
+                    else{
+                        messageDiv.append(newMessage+"margin-light:auto"+newMessage2+heyMessage)
+                    }
+                }
+            }});
+    }
+
+    $(document).ready( function () {
+        var chatDiv = $("#chatDiv")
+
+        const beforeGroupName= `
+        <div class="d-flex align-items-center w-auto h-auto chats" style="padding: 5px" onclick="chatClicked(`
+        const after_arg = `)">
+                    <div class="w-100" style="background-color: #F6FFF8">
+                        <div class="container row d-flex w-100">
+                            <div class="col-2">
+                                <i class="bi bi-image" style="font-size: 3rem;" ></i>
+                            </div>
+                            <div class="col">
+                                <div class="d-flex align-items-center h-100 w-100">
+                                    <div class="d-flex justify-content-center w-100">`
+        const afterGroupName = `</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-center"><p>`
+        const beforeLastMessage = `</p>
+                        </div>
+                    </div>
+                </div>`
+
+        $.ajax({
+            url: "/person/people_chats/{{.id}}/",
+            type: "GET",
+            cache: true,
+            success: function(response){
+                console.log(response.data)
+                for (item in response.data){
+                    chatDiv.append(beforeGroupName + response.data[item].ID + after_arg + response.data[item].ChatName + afterGroupName + response.data[item].ChatLastMessage + beforeLastMessage);
+                }
+            }});
+
+    });
+</script>
+
 <body class="h-100 w-100" style="background-color: #6B9080">
-    <main class="row h-100 w-100" style="padding: 10px; margin: 0">
+    <main class="row h-100 w-100" style="padding-left: 10px; padding-right:10px; margin: 0">
         <div class="col-3 h-100" style="background-color: #A4C3B2">
             <div class="d-flex w-100 align-items-center" style="height: 10%">
                 <div class="d-flex w-100 justify-content-center">
@@ -13,26 +105,7 @@
                     <h3> {{ .nickname }} </h3>
                 </div>
             </div>
-            <div class="w-100" style="background-color: #CCE3DE; height: 90%">
-                <div class="d-flex align-items-center w-auto" style="height: 20%">
-                    <div class="w-100" style="margin: 5px; background-color: #F6FFF8">
-                        <div class="container row d-flex w-100">
-                            <div class="col-2">
-                                <i class="bi bi-image" style="font-size: 3rem;" ></i>
-                            </div>
-                            <div class="col">
-                                <div class="d-flex align-items-center h-100 w-100">
-                                    <div class="d-flex justify-content-center w-100">
-                                        Group Name
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="d-flex justify-content-center">
-                            <p>Last Message: Hey bro whats up</p>
-                        </div>
-                    </div>
-                </div>
+            <div id="chatDiv" class="w-100" style="background-color: #CCE3DE; height: 90%; padding: 0">
             </div>
         </div>
         <div class="col h-100 w-100" style="background-color: whitesmoke">
@@ -44,31 +117,12 @@
                     </div>
                 </div>
             </div>
-            <div class="w-100" style="height: 80%;background-color: #CCE3DE">
-                <div class="card w-50" style="background-color: #212529; color: whitesmoke">
-                    <div class="card-body">
-                        <div class="card-title row d-flex">
-                            <div class="col">
-                                <h5 class="card-title"> Sender</h5>
-                            </div>
-                            <div class="col-2">
-                                18:09
-                            </div>
-                        </div>
-                        <p class="card-text">Message Writes Here</p>
-                    </div>
-                </div>
-                <div class="card w-50" style="background-color: #212529; color: whitesmoke">
-                    <div class="card-body">
-                        <h5 class="card-title"> Sender</h5>
-                        <p class="card-text">Message Writes Here</p>
-                    </div>
-                </div>
+            <div id="messageDiv" class="w-100" style="height: 80%;background-color: #CCE3DE; position: relative; overflow-y: auto">
             </div>
             <div class="w-100" style="height: 10%;background-color: #A4C3B2">
                 <div class="input-group">
-                    <textarea class="form-control" aria-label="With textarea" style="resize: none"></textarea>
-                    <button type="submit" class="btn btn-dark">Send</button>
+                    <textarea id="contextArea" class="form-control" aria-label="With textarea" style="resize: none"></textarea>
+                    <button type="button" class="btn btn-dark" onclick="sendClicked()">Send</button>
                 </div>
             </div>
         </div>
