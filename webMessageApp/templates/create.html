@@ -1,0 +1,19 @@
+<html class="w-100 h-100">
+
+{{ template "header.html"}}
+
+<script>
+</script>
+
+<body class="h-100 w-100" style="background-color: #6B9080">
+<main class="h-100 w-100 d-flex justify-content-center h-100 w-100 align-items-center">
+  <form method="post" action="/person/people" enctype="multipart/form-data">
+    <div class="form-group">
+      <label for="nicknameInput">Nickname</label>
+      <input class="form-control" id="nicknameInput" name="Nickname" placeholder="Enter Nickname">
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+</main>
+</body>
+</html>
