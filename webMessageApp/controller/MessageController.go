@@ -10,21 +10,22 @@ import (
 
 func CreateChat(c *gin.Context) {
 	chat := models.Chat{}
-	database.DB.Create(&chat)
 	var people []models.Person
 	var input validators.CreateChatInput
 
 	if err := c.ShouldBindJSON(&input); err != nil {
+		println(err.Error(), "error2")
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
-	if err := database.DB.Find(people, input.People).Error; err != nil {
+	chat.ChatName = input.ChatName
+	database.DB.Create(&chat)
+	if err := database.DB.Find(&people, input.People).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Record not found!"})
 		return
 	}
 	for _, person := range people {
-		err := database.DB.Model(person).Association("Chats").Append(&chat)
+		err := database.DB.Model(&person).Association("Chats").Append(&chat)
 		if err != nil {
 			return
 		}
@@ -77,7 +78,6 @@ func FindMessages(c *gin.Context) {
 func CreateMessage(c *gin.Context) {
 	// Validate input
 	var input validators.CreateMessageInput
-	println(c.PostForm("Person"))
 	if err := c.ShouldBindJSON(&input); err != nil {
 		println(err.Error())
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

@@ -2,9 +2,71 @@
 
 {{ template "header.html"}}
 
+
+
+
 <script>
     const currentPersonID = {{.id}}
     var currentChatID = null
+
+    var intervalId = window.setInterval(function(){
+        console.log("hey")
+        SetChatDiv()
+        if (currentChatID != null){
+            chatClicked(currentChatID)
+        }
+    }, 60000);//every minute
+
+
+    function SetChatDiv(){
+        var chatDiv = $("#chatDiv")
+        chatDiv.html("")
+
+        const beforeGroupName= `
+        <div class="d-flex align-items-center w-auto h-auto chats" style="padding: 5px" onclick="chatClicked(`
+        const after_arg = `)">
+                    <div class="w-100" style="background-color: #F6FFF8">
+                        <div class="container row d-flex w-100">
+                            <div class="col-2">
+                                <i class="bi bi-image" style="font-size: 3rem;" ></i>
+                            </div>
+                            <div class="col">
+                                <div class="d-flex align-items-center h-100 w-100">
+                                    <div class="d-flex justify-content-center w-100">`
+        const afterGroupName = `</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-center"><p>`
+        const beforeLastMessage = `</p>
+                        </div>
+                    </div>
+                </div>`
+
+        $.ajax({
+            url: "/person/people_chats/{{.id}}/",
+            type: "GET",
+            cache: true,
+            success: function(response){
+                console.log(response.data)
+                for (item in response.data){
+                    chatDiv.append(beforeGroupName + response.data[item].ID + after_arg + response.data[item].ChatName + afterGroupName + response.data[item].ChatLastMessage + beforeLastMessage);
+                }
+            }});
+    }
+
+    function AddFriend(userID, widget){
+        console.log("hey")
+        $.ajax({
+            url: "/person/people_add_friend_list/"+currentPersonID+"/",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({person: [parseInt(currentPersonID), parseInt(userID)]}),
+            cache: true,
+            success: function(response){
+                console.log(response)
+            }});
+    }
 
     function sendClicked(){
         var TextArea = $("#contextArea")
@@ -59,40 +121,67 @@
     }
 
     $(document).ready( function () {
-        var chatDiv = $("#chatDiv")
+        SetChatDiv()
+        $('#addFriendModal').on('show.bs.modal', function (e) {
+            var AddFriendList = $("#AddFriendList")
+            AddFriendList.html("")
 
-        const beforeGroupName= `
-        <div class="d-flex align-items-center w-auto h-auto chats" style="padding: 5px" onclick="chatClicked(`
-        const after_arg = `)">
-                    <div class="w-100" style="background-color: #F6FFF8">
-                        <div class="container row d-flex w-100">
-                            <div class="col-2">
-                                <i class="bi bi-image" style="font-size: 3rem;" ></i>
-                            </div>
-                            <div class="col">
-                                <div class="d-flex align-items-center h-100 w-100">
-                                    <div class="d-flex justify-content-center w-100">`
-        const afterGroupName = `</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="d-flex justify-content-center"><p>`
-        const beforeLastMessage = `</p>
-                        </div>
-                    </div>
-                </div>`
+            //`<div className="d-flex row"><div className="col"><p>Heyyo</p></div><div className="col"><button type="button" className="btn btn-dark">Add Friend</button></div></div>`
+            const text = `<div class="d-flex row"><div class="col"><p>`
+            const text2 = `</p></div><div class="col"><button type="button" class="btn btn-dark" onclick="AddFriend(`
+            const text3 = ",this)\">Add Friend</button></div></div>"
 
+            $.ajax({
+                url: "/person/people_add_friend_list/{{.id}}/",
+                type: "GET",
+                cache: true,
+                success: function(response){
+                    console.log(response.data)
+                    for (item in response.data){
+                        console.log(response.data[item])
+                        AddFriendList.append(text+response.data[item].nickname+text2+response.data[item].ID+text3)
+                    }
+                }});
+        })
+        $('#createGroupModal').on('show.bs.modal', function (e) {
+            var CreateGroupList = $("#CreateGroupList")
+            CreateGroupList.html("")
+            console.log("create gr")
+            //`<div className="d-flex row"><div className="col"><p>Heyyo</p></div><div className="col"><button type="button" className="btn btn-dark">Add Friend</button></div></div>`
+            const text = `<div class="form-check"><input class="form-check-input" type="checkbox" name="person"`
+            const text2 = `><label class="form-check-label"`
+            const text3 = "</label</div"
+
+            $.ajax({
+                url: "/person/people_create_group_list/{{.id}}/",
+                type: "GET",
+                cache: true,
+                success: function(response){
+                    console.log(response.data)
+                    for (item in response.data){
+                        console.log(response.data[item])
+                        CreateGroupList.append(text+"value="+response.data[item].ID+` id=formCheck`+response.data[item].ID+text2+"for=formCheck"+response.data[item].ID+">"+response.data[item].nickname+text3)
+                    }
+                }});
+        })
+    $("#createGroupButton").click( function () {
+        var form = $("#CreateGroupList")
+        var array = Array()
+        array.push(parseInt(currentPersonID))
+        var formArray = form.serializeArray()
+        for (const serializeArrayKey in formArray) {
+            console.log(formArray[serializeArrayKey]['value'])
+            array.push(parseInt(formArray[serializeArrayKey]['value']))
+        }
         $.ajax({
-            url: "/person/people_chats/{{.id}}/",
-            type: "GET",
+            url: "/message/create_chat/",
+            type: "POST",
             cache: true,
+            data: JSON.stringify({person: array, ChatName: $("#groupNameEntry").val()}),
             success: function(response){
                 console.log(response.data)
-                for (item in response.data){
-                    chatDiv.append(beforeGroupName + response.data[item].ID + after_arg + response.data[item].ChatName + afterGroupName + response.data[item].ChatLastMessage + beforeLastMessage);
-                }
             }});
-
+    })
     });
 </script>
 
@@ -105,7 +194,11 @@
                     <h3> {{ .nickname }} </h3>
                 </div>
             </div>
-            <div id="chatDiv" class="w-100" style="background-color: #CCE3DE; height: 90%; padding: 0">
+            <div id="chatDiv" class="w-100" style="background-color: #CCE3DE; height: 80%; padding: 0">
+            </div>
+            <div class="d-flex justify-content-around">
+                <button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#addFriendModal">Add Friend</button>
+                <button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#createGroupModal">Create Group</button>
             </div>
         </div>
         <div class="col h-100 w-100" style="background-color: whitesmoke">
@@ -127,5 +220,10 @@
             </div>
         </div>
     </main>
+
+    {{ template "addFriendModal.html" }}
+
+    {{ template "createGroupModal.html" }}
+
 </body>
 </html>

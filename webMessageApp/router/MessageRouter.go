@@ -10,6 +10,7 @@ func SetMessageRouter(engine *gin.Engine) {
 	{
 		groupApi.GET("/messages", controller.FindMessages)
 		groupApi.POST("/messages", controller.CreateMessage)
+		groupApi.POST("/create_chat/", controller.CreateChat)
 		groupApi.GET("/messages/:id", controller.FindMessage)
 		groupApi.GET("/chat_messages/:id", controller.GetChatMessages)
 		groupApi.PATCH("/messages/:id", controller.UpdateMessage)

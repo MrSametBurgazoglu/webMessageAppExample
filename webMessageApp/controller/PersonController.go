@@ -57,6 +57,7 @@ func GetPersonChats(c *gin.Context) { // Get model if exist
 			database.DB.Preload("Person").Find(&chat).First(&chatDb)
 			for _, p := range chatDb.Person {
 				if p.ID != person.ID {
+					println(p.ID, person.ID)
 					chat.ChatName = p.Nickname
 				}
 			}
@@ -72,6 +73,47 @@ func GetPersonChats(c *gin.Context) { // Get model if exist
 	}
 	c.JSON(http.StatusOK, gin.H{"data": person.Chats})
 
+}
+
+func GetPersonAddFriendList(c *gin.Context) {
+	var personIDList []int
+	var personAddFriendList []models.Person
+	result := database.DB.Raw("SELECT id FROM people WHERE id NOT IN (SELECT DISTINCT person_id FROM people_chats WHERE chat_id IN (SELECT chat_id from people_chats WHERE person_id = ?)) AND id <> ?;", c.Param("id"), c.Param("id")).Scan(&personIDList)
+	if result.RowsAffected != 0 {
+		database.DB.Find(&personAddFriendList, personIDList)
+	}
+	c.JSON(http.StatusOK, gin.H{"data": personAddFriendList})
+}
+
+func PersonAddFriendList(c *gin.Context) {
+	// Get model if exist
+
+	// Validate input
+	var input validators.CreateChatInput
+	if err := c.ShouldBindJSON(&input); err != nil {
+		println(err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	var chat = models.Chat{ChatName: ""}
+	database.DB.Create(&chat)
+	for _, personId := range input.People {
+		var person models.Person
+		database.DB.Find(&person, personId)
+		println(personId, "added to association")
+		database.DB.Model(&person).Association("Chats").Append(&chat)
+	}
+	c.JSON(http.StatusOK, gin.H{"data": chat})
+}
+
+func GetChatCreateFriendList(c *gin.Context) {
+	var personIDList []int
+	var personAddFriendList []models.Person
+	result := database.DB.Raw("SELECT DISTINCT person_id FROM people_chats WHERE chat_id IN (SELECT chat_id from people_chats WHERE person_id = ?) AND person_id <> ?;", c.Param("id"), c.Param("id")).Scan(&personIDList)
+	if result.RowsAffected != 0 {
+		database.DB.Find(&personAddFriendList, personIDList)
+	}
+	c.JSON(http.StatusOK, gin.H{"data": personAddFriendList})
 }
 
 func UpdatePerson(c *gin.Context) {
