@@ -17,12 +17,13 @@ func ConnectDatabase() {
 		databaseHost := os.Getenv("DATABASE_URL")
 		databaseUser := os.Getenv("DATABASE_USER")
 		databasePassword := os.Getenv("DATABASE_PASSWORD")
-		databaseName := os.Getenv("DATABASE_PASSWORD")
-		dsn = fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disabe",
+		databaseName := os.Getenv("DATABASE_NAME")
+		dsn = fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable",
 			databaseHost,
 			databaseUser,
 			databasePassword,
 			databaseName)
+		dsn = "host=" + databaseHost + " user=" + databaseUser + " password=" + databasePassword + " dbname=" + databaseName + " sslmode=disable"
 	} else {
 		dsn = "host=localhost user=message_app password=76T4376T43 dbname=web_message_app sslmode=disable"
 	}
