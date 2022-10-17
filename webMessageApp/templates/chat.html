@@ -3,14 +3,11 @@
 {{ template "header.html"}}
 
 
-
-
 <script>
     const currentPersonID = {{.id}}
     var currentChatID = null
 
     var intervalId = window.setInterval(function(){
-        console.log("hey")
         SetChatDiv()
         if (currentChatID != null){
             chatClicked(currentChatID)
@@ -24,20 +21,8 @@
 
         const beforeGroupName= `
         <div class="d-flex align-items-center w-auto h-auto chats" style="padding: 5px" onclick="chatClicked(`
-        const after_arg = `)">
-                    <div class="w-100" style="background-color: #F6FFF8">
-                        <div class="container row d-flex w-100">
-                            <div class="col-2">
-                                <i class="bi bi-image" style="font-size: 3rem;" ></i>
-                            </div>
-                            <div class="col">
-                                <div class="d-flex align-items-center h-100 w-100">
-                                    <div class="d-flex justify-content-center w-100">`
-        const afterGroupName = `</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="d-flex justify-content-center"><p>`
+        const after_arg = `)"><div class="w-100" style="background-color: #F6FFF8"><div class="container row d-flex w-100">`
+        const afterGroupName = `</div</div><div><p>`
         const beforeLastMessage = `</p>
                         </div>
                     </div>
@@ -50,7 +35,7 @@
             success: function(response){
                 console.log(response.data)
                 for (item in response.data){
-                    chatDiv.append(beforeGroupName + response.data[item].ID + after_arg + response.data[item].ChatName + afterGroupName + response.data[item].ChatLastMessage + beforeLastMessage);
+                    chatDiv.append(beforeGroupName + response.data[item].ID + ' ,\''  + response.data[item].ChatName + '\'' + after_arg + "<h4>" + response.data[item].ChatName + "</h4>" + afterGroupName + response.data[item].ChatLastMessage + beforeLastMessage);
                 }
             }});
     }
@@ -66,6 +51,9 @@
             success: function(response){
                 console.log(response)
             }});
+        console.log(widget);
+        widget.disabled=true;
+        SetChatDiv()
     }
 
     function sendClicked(){
@@ -83,9 +71,10 @@
         TextArea.val('')
     }
 
-    function chatClicked(p1){
+    function chatClicked(p1, p2){
         console.log(p1)
         currentChatID = p1
+        $("#ChatName").text(p2)
         var messageDiv = $("#messageDiv")
         $.ajax({
             url: "/message/chat_messages/"+p1+"/",
@@ -146,7 +135,6 @@
         $('#createGroupModal').on('show.bs.modal', function (e) {
             var CreateGroupList = $("#CreateGroupList")
             CreateGroupList.html("")
-            console.log("create gr")
             //`<div className="d-flex row"><div className="col"><p>Heyyo</p></div><div className="col"><button type="button" className="btn btn-dark">Add Friend</button></div></div>`
             const text = `<div class="form-check"><input class="form-check-input" type="checkbox" name="person"`
             const text2 = `><label class="form-check-label"`
@@ -181,6 +169,8 @@
             success: function(response){
                 console.log(response.data)
             }});
+        $('#createGroupModal').modal('toggle');
+        SetChatDiv()
     })
     });
 </script>
@@ -190,7 +180,6 @@
         <div class="col-3 h-100" style="background-color: #A4C3B2">
             <div class="d-flex w-100 align-items-center" style="height: 10%">
                 <div class="d-flex w-100 justify-content-center">
-                    <i class="bi bi-person-circle" style="font-size: 2rem;" ></i>
                     <h3> {{ .nickname }} </h3>
                 </div>
             </div>
@@ -205,8 +194,7 @@
             <div class="w-100" style="height: 10%;background-color: #A4C3B2">
                 <div class="d-flex h-100 w-100 align-items-center">
                     <div class="d-flex w-100 justify-content-center">
-                        <i class="bi bi-person-circle" style="font-size: 2rem;" ></i>
-                        <h3> {{ .nickname }} </h3>
+                        <h3 id="ChatName"></h3>
                     </div>
                 </div>
             </div>
@@ -214,7 +202,7 @@
             </div>
             <div class="w-100" style="height: 10%;background-color: #A4C3B2">
                 <div class="input-group">
-                    <textarea id="contextArea" class="form-control" aria-label="With textarea" style="resize: none"></textarea>
+                    <textarea id="contextArea" class="form-control" aria-label="With textarea" style="resize: none" rows="1"></textarea>
                     <button type="button" class="btn btn-dark" onclick="sendClicked()">Send</button>
                 </div>
             </div>

@@ -1,16 +1,31 @@
 package database
 
 import (
+	"fmt"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"os"
 	"webMessageApp/models"
 )
 
 var DB *gorm.DB
 
 func ConnectDatabase() {
-
-	dsn := "host=localhost user=message_app password=76T4376T43 dbname=web_message_app sslmode=disable"
+	productionServer := os.Getenv("ON_PRODUCTION")
+	var dsn string
+	if productionServer != "" {
+		databaseHost := os.Getenv("DATABASE_URL")
+		databaseUser := os.Getenv("DATABASE_USER")
+		databasePassword := os.Getenv("DATABASE_PASSWORD")
+		databaseName := os.Getenv("DATABASE_PASSWORD")
+		dsn = fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disabe",
+			databaseHost,
+			databaseUser,
+			databasePassword,
+			databaseName)
+	} else {
+		dsn = "host=localhost user=message_app password=76T4376T43 dbname=web_message_app sslmode=disable"
+	}
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
 	if err != nil {

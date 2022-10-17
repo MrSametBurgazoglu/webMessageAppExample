@@ -3,6 +3,8 @@ package app
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"webMessageApp/database"
+	"webMessageApp/models"
 )
 
 func HomePage(c *gin.Context) {
@@ -12,8 +14,10 @@ func HomePage(c *gin.Context) {
 }
 
 func ChatPage(c *gin.Context) {
+	var person models.Person
+	database.DB.First(&person, c.Param("id"))
 	c.HTML(http.StatusOK, "chat.html", gin.H{
-		"nickname": "Samet Burgazoğlu",
+		"nickname": person.Nickname,
 		"id":       c.Param("id"),
 	})
 }
