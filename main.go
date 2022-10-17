@@ -2,8 +2,8 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	"webMessageApp/app"
 	"webMessageApp/database"
+	"webMessageApp/webApp"
 )
 
 func main() {
@@ -11,7 +11,7 @@ func main() {
 
 	database.ConnectDatabase()
 
-	app.SetRouter(r)
+	webApp.SetRouter(r)
 
 	r.LoadHTMLGlob("templates/*")
 

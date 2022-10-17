@@ -1,4 +1,4 @@
-package app
+package webApp
 
 import (
 	"github.com/gin-gonic/gin"
