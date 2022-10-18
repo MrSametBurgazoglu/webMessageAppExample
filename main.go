@@ -11,6 +11,7 @@ import (
 func main() {
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
+	r.SetTrustedProxies([]string{"192.168.1.2"})
 
 	database.ConnectDatabase()
 
