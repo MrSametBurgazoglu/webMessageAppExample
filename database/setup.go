@@ -23,7 +23,7 @@ func ConnectDatabase() {
 			databaseUser,
 			databasePassword,
 			databaseName)
-		dsn = "host=" + databaseHost + " user=" + databaseUser + " password=" + databasePassword + " dbname=" + databaseName
+		dsn = "host=" + databaseHost + " user=" + databaseUser + " password=" + databasePassword + " dbname=" + databaseName + " sslmode=disable"
 	} else {
 		dsn = "host=localhost user=message_app password=76T4376T43 dbname=web_message_app sslmode=disable"
 	}
