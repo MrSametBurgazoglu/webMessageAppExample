@@ -11,7 +11,7 @@ import (
 func main() {
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
-	r.SetTrustedProxies([]string{"192.168.1.2"})
+	r.SetTrustedProxies([]string{"192.168.1.2", os.Getenv("RENDER_EXTERNAL_HOSTNAME")})
 	println("\n\n")
 	println(os.Getenv("RENDER_EXTERNAL_HOSTNAME"))
 	println("\n\n")
