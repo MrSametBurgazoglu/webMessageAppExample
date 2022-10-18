@@ -35,6 +35,7 @@ func ConnectDatabase() {
 
 	migrateErr := db.AutoMigrate(&models.Message{}, &models.Chat{}, &models.Person{})
 	if migrateErr != nil {
+		panic("migration error")
 		return
 	}
 
