@@ -10,4 +10,14 @@ I made both backend and frontend of this web app.
 
 ![Show All Users](docs/index.png?raw=true "Index Page")
 
+### Main Page
 
+![Show Chats and Messages](docs/main.png?raw=true "Main Page")
+
+### Add Friend Section
+
+![Add Friend](docs/add_friend.png?raw=true "Main Page")
+
+### Create Group Section
+
+![Create Group](docs/create_group.png?raw=true "Main Page")
