@@ -6,14 +6,11 @@ import (
 )
 
 func SetMessageRouter(engine *gin.Engine) {
-	groupApi := engine.Group("/message")
+	messageApi := engine.Group("/message")
 	{
-		groupApi.GET("/messages", controller.FindMessages)
-		groupApi.POST("/messages", controller.CreateMessage)
-		groupApi.POST("/create_chat/", controller.CreateChat)
-		groupApi.GET("/messages/:id", controller.FindMessage)
-		groupApi.GET("/chat_messages/:id", controller.GetChatMessages)
-		groupApi.PATCH("/messages/:id", controller.UpdateMessage)
-		groupApi.DELETE("/messages/:id", controller.DeleteMessage)
+		messageApi.POST("/messages", controller.CreateMessage)
+		messageApi.POST("/create_chat/", controller.CreateChat)
+		messageApi.GET("/messages/:id", controller.FindMessage)
+		messageApi.GET("/chat_messages/:id", controller.GetChatMessages)
 	}
 }

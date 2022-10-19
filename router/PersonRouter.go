@@ -13,7 +13,5 @@ func SetPersonRouter(engine *gin.Engine) {
 		peopleApi.GET("/people_add_friend_list/:id", controller.GetPersonAddFriendList)
 		peopleApi.POST("/people_add_friend_list/:id", controller.PersonAddFriendList)
 		peopleApi.GET("/people_create_group_list/:id", controller.GetChatCreateFriendList)
-		peopleApi.PATCH("/people/:id", controller.UpdatePerson)
-		peopleApi.DELETE("/people/:id", controller.DeletePerson)
 	}
 }

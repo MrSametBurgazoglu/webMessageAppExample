@@ -116,6 +116,7 @@ func GetChatCreateFriendList(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": personAddFriendList})
 }
 
+/* Not in this version
 func UpdatePerson(c *gin.Context) {
 	// Get model if exist
 	var person models.Person
@@ -134,7 +135,9 @@ func UpdatePerson(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"data": person})
 }
+*/
 
+/* Not in this version
 func DeletePerson(c *gin.Context) {
 	// Get model if exist
 	var person models.Person
@@ -147,3 +150,4 @@ func DeletePerson(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"data": true})
 }
+*/

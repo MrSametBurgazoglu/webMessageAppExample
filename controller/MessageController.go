@@ -32,30 +32,6 @@ func CreateChat(c *gin.Context) {
 	}
 }
 
-func CreateMessageForChat(c *gin.Context) {
-	var input validators.CreateMessageInput
-	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	var chat models.Chat
-	if err := database.DB.Find(&chat, input.Chat).Error; err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Record not found!"})
-		return
-	}
-
-	// Create message
-	message := models.Message{Context: input.Context}
-	database.DB.Create(&message)
-	err := database.DB.Model(chat).Association("Messages").Append(&message)
-	if err != nil {
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"data": message})
-}
-
 func GetChatMessages(c *gin.Context) { // Get model if exist
 	var messages []models.Message
 
@@ -66,13 +42,6 @@ func GetChatMessages(c *gin.Context) { // Get model if exist
 	println(messages)
 	c.JSON(http.StatusOK, gin.H{"data": messages})
 
-}
-
-func FindMessages(c *gin.Context) {
-	var messages []models.Message
-	database.DB.Find(&messages)
-
-	c.JSON(http.StatusOK, gin.H{"data": messages})
 }
 
 func CreateMessage(c *gin.Context) {
@@ -106,6 +75,7 @@ func FindMessage(c *gin.Context) { // Get model if exist
 	c.JSON(http.StatusOK, gin.H{"data": message})
 }
 
+/* Is this necessary?
 func UpdateMessage(c *gin.Context) {
 	// Get model if exist
 	var group models.Message
@@ -124,16 +94,4 @@ func UpdateMessage(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"data": group})
 }
-
-func DeleteMessage(c *gin.Context) {
-	// Get model if exist
-	var group models.Message
-	if err := database.DB.Where("id = ?", c.Param("id")).First(&group).Error; err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Record not found!"})
-		return
-	}
-
-	database.DB.Delete(&group)
-
-	c.JSON(http.StatusOK, gin.H{"data": true})
-}
+*/
